@@ -1,4 +1,3 @@
-## cloned from Oliver Siegmar's Repo - https://github.com/osiegmar/aws-lambda-backup
 
 import logging
 from datetime import date
@@ -29,6 +28,7 @@ def backup():
 
 def backup_instance(instance):
     instance_tags = dict(map(lambda x: (x['Key'], x['Value']), instance.tags or []))
+
     instance_name = instance_tags.get('Name', '[unnamed]')
     backup_cfg_str = instance_tags['LambdaBackupConfiguration']
 
@@ -62,7 +62,7 @@ def backup_instance(instance):
             'InstanceName': instance_name,
             'DeleteOn': delete_date_fmt
         }
-        tag_list = map(lambda (k, v): {'Key': k, 'Value': v}, list(tags.items()))
+        tag_list = map(lambda k, v: {'Key': k, 'Value': v}, list(tags.items()))
         client.create_tags(Resources=snapshot_ids, Tags=tag_list)
 
 
@@ -79,7 +79,7 @@ def parse_config(instance, instance_name, config):
 
 def calc_retention(backup_configuration):
     today = date.today()
-    r_daily, r_weekly, r_monthly, r_yearly = backup_configuration
+    r_daily, r_weekly, r_monthly, r_yearly = backup_configuration 
     if today.day == 1:
         if today.month == 1 and r_yearly > 0:
             return 'yearly', relativedelta(years=r_yearly)
